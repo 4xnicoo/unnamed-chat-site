@@ -39,6 +39,12 @@ function joinChat() {
             document.getElementById("setupScreen").classList.add("hidden");
             document.getElementById("chatScreen").classList.remove("hidden");
             document.getElementById("messageInput").focus();
+            // Update user list with initial users
+            if (data.users) {
+                updateUserList(data.users);
+            }
+        } else if (data.type === "user_list") {
+            updateUserList(data.users);
         } else if (data.type === "message" || data.type === "join" || data.type === "leave") {
             displayMessage(data);
         }
@@ -54,6 +60,8 @@ function joinChat() {
         document.getElementById("chatScreen").classList.add("hidden");
         document.getElementById("setupScreen").classList.remove("hidden");
         document.getElementById("messages").innerHTML = "";
+        document.getElementById("usersList").innerHTML = "";
+        document.getElementById("userCount").textContent = "0";
     };
 }
 
@@ -103,6 +111,34 @@ function displayMessage(data) {
     
     messagesDiv.appendChild(messageDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+function updateUserList(users) {
+    const usersList = document.getElementById("usersList");
+    const userCount = document.getElementById("userCount");
+    
+    // Update count
+    userCount.textContent = users.length.toString();
+    
+    // Clear and rebuild user list
+    usersList.innerHTML = "";
+    
+    users.forEach(user => {
+        const userItem = document.createElement("div");
+        userItem.className = "user-item";
+        
+        const indicator = document.createElement("div");
+        indicator.className = "user-indicator";
+        
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "user-name";
+        nameSpan.style.color = user.color;
+        nameSpan.textContent = user.username;
+        
+        userItem.appendChild(indicator);
+        userItem.appendChild(nameSpan);
+        usersList.appendChild(userItem);
+    });
 }
 
 // Allow sending message with Enter key

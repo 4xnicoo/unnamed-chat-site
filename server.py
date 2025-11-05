@@ -70,11 +70,19 @@ async def websocket_endpoint(websocket: WebSocket):
         }
         await broadcast_message(join_message, exclude=websocket)
         
-        # Send confirmation to the user
+        # Send confirmation to the user with current user list
+        current_users = [
+            {"username": user_data[conn]["username"], "color": user_data[conn]["color"]}
+            for conn in active_connections if conn in user_data
+        ]
         await websocket.send_text(json.dumps({
             "type": "connected",
-            "message": "You joined the chat!"
+            "message": "You joined the chat!",
+            "users": current_users
         }))
+        
+        # Broadcast updated user list to all clients
+        await broadcast_user_list()
         
         # Listen for messages
         while True:
@@ -102,6 +110,8 @@ async def websocket_endpoint(websocket: WebSocket):
             await broadcast_message(leave_message, exclude=websocket)
             del user_data[websocket]
         active_connections.discard(websocket)
+        # Broadcast updated user list after user leaves
+        await broadcast_user_list()
 
 async def broadcast_message(message: dict, exclude: WebSocket = None):
     """Broadcast a message to all connected clients except the excluded one"""
@@ -120,6 +130,18 @@ async def broadcast_message(message: dict, exclude: WebSocket = None):
         active_connections.discard(connection)
         if connection in user_data:
             del user_data[connection]
+
+async def broadcast_user_list():
+    """Broadcast the current user list to all connected clients"""
+    current_users = [
+        {"username": user_data[conn]["username"], "color": user_data[conn]["color"]}
+        for conn in active_connections if conn in user_data
+    ]
+    user_list_message = {
+        "type": "user_list",
+        "users": current_users
+    }
+    await broadcast_message(user_list_message)
 
 if __name__ == "__main__":
     import uvicorn

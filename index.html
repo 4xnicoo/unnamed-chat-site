@@ -29,11 +29,23 @@
                 <button id="leaveBtn" onclick="leaveChat()">Leave</button>
             </div>
             
-            <div id="messages" class="messages"></div>
-            
-            <div class="input-area">
-                <input type="text" id="messageInput" placeholder="Type a message..." maxlength="500">
-                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            <div class="chat-content">
+                <div class="chat-main">
+                    <div id="messages" class="messages"></div>
+                    
+                    <div class="input-area">
+                        <input type="text" id="messageInput" placeholder="Type a message..." maxlength="500">
+                        <button id="sendBtn" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+                
+                <div class="users-sidebar">
+                    <div class="users-header">
+                        <h3>Online Users</h3>
+                        <span id="userCount" class="user-count">0</span>
+                    </div>
+                    <div id="usersList" class="users-list"></div>
+                </div>
             </div>
         </div>
     </div>
