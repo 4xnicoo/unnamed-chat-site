@@ -1,4 +1,4 @@
-# LiveSpeak Chat
+# unnamed chat website
 
 A simple WebSocket-based chat application with a Python backend and a clean web frontend.
 
