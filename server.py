@@ -13,21 +13,36 @@ active_connections: Set[WebSocket] = set()
 # Store user info (websocket -> user data)
 user_data: Dict[WebSocket, Dict] = {}
 
+# Get the directory where this file is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Serve static files
-static_dir = os.path.dirname(os.path.abspath(__file__))
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
 
 @app.get("/")
 async def get_index():
-    return FileResponse("index.html")
+    return FileResponse(
+        os.path.join(BASE_DIR, "index.html"),
+        media_type="text/html"
+    )
 
 @app.get("/style.css")
 async def get_style():
-    return FileResponse("style.css")
+    return FileResponse(
+        os.path.join(BASE_DIR, "style.css"),
+        media_type="text/css"
+    )
 
 @app.get("/script.js")
 async def get_script():
-    return FileResponse("script.js")
+    return FileResponse(
+        os.path.join(BASE_DIR, "script.js"),
+        media_type="application/javascript"
+    )
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -108,5 +123,6 @@ async def broadcast_message(message: dict, exclude: WebSocket = None):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
